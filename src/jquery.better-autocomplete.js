@@ -191,8 +191,20 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
 
   inputEvents.keydown = function(event) {
     var index = getHighlighted();
+    var hasResults = (($results.children().length && index < 0) || index >= 0);
+
+    // no highlight but, they pressed [enter]
+    if (hasResults &&
+        event.keyCode == 13 &&
+        index < 0) {
+        // assume the user wants to perform the search without using
+        // any of the suggestions
+        this.form.submit();
+        return false;
+    }
+
     // If an arrow key is pressed and a result is highlighted
-    if ($.inArray(event.keyCode, [38, 40]) >= 0 && index >= 0) {
+    if ($.inArray(event.keyCode, [38, 40]) >= 0 && hasResults) {
       var newIndex,
         size = $('.result', $results).length;
       switch (event.keyCode) {
@@ -445,7 +457,6 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
     else if (lastRenderedQuery !== query) {
       lastRenderedQuery = query;
       renderResults(cache[query]);
-      setHighlighted(0);
     }
     // Finally show/hide based on focus and emptiness
     if (($input.is(':focus') || focus) && !$results.is(':empty')) {
