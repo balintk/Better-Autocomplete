@@ -174,7 +174,8 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
     cacheLimit: isLocal ? 0 : 256, // Number of result objects
     remoteTimeout: 10000, // milliseconds
     crossOrigin: false,
-    selectKeys: [9, 13] // [tab, enter]
+    selectKeys: [9, 13], // [tab, enter]
+    autoHighlight: false, // true, auto-highlight first result
   }, options);
 
   callbacks = $.extend({}, defaultCallbacks, callbacks);
@@ -195,7 +196,8 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
 
     // no highlight but, they pressed [enter]
     if (hasResults &&
-        event.keyCode == 13 &&
+        !options.autoHighlight &&
+        event.keyCode === 13 &&
         index < 0) {
         // assume the user wants to perform the search without using
         // any of the suggestions
@@ -457,6 +459,9 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
     else if (lastRenderedQuery !== query) {
       lastRenderedQuery = query;
       renderResults(cache[query]);
+      if (options.autoHighlight) {
+          setHighlighted(0);
+      }
     }
     // Finally show/hide based on focus and emptiness
     if (($input.is(':focus') || focus) && !$results.is(':empty')) {
