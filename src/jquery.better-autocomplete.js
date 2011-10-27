@@ -175,7 +175,7 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
     remoteTimeout: 10000, // milliseconds
     crossOrigin: false,
     selectKeys: [9, 13], // [tab, enter]
-    autoHighlight: false, // true, auto-highlight first result
+    autoHighlight: false // true, auto-highlight first result
   }, options);
 
   callbacks = $.extend({}, defaultCallbacks, callbacks);
@@ -192,11 +192,9 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
 
   inputEvents.keydown = function(event) {
     var index = getHighlighted();
-    var hasResults = (($results.children().length && index < 0) || index >= 0);
 
     // no highlight but, they pressed [enter]
-    if (hasResults &&
-        !options.autoHighlight &&
+    if (!options.autoHighlight &&
         event.keyCode === 13 &&
         index < 0) {
         // assume the user wants to perform the search without using
@@ -205,6 +203,7 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
         return false;
     }
 
+    var hasResults = (($results.children().length && index < 0) || index >= 0);
     // If an arrow key is pressed and a result is highlighted
     if ($.inArray(event.keyCode, [38, 40]) >= 0 && hasResults) {
       var newIndex,
