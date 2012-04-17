@@ -175,7 +175,8 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
     remoteTimeout: 10000, // milliseconds
     crossOrigin: false,
     selectKeys: [9, 13], // [tab, enter]
-    autoHighlight: false // true, auto-highlight first result
+    autoHighlight: false, // true, auto-highlight first result
+    autoSelect: true // Select the highlighted element automatically
   }, options);
 
   callbacks = $.extend({}, defaultCallbacks, callbacks);
@@ -351,6 +352,9 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
       $results.scrollTop($scrollTo.position().top + $results.scrollTop() +
           $scrollTo.outerHeight() - $results.height());
     }
+    if (options.autoSelect) {
+      selectHighlighted(true);
+    }
   };
 
   /**
@@ -426,7 +430,15 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
    * Reprocess the contents of the input field, fetch data and redraw if
    * necessary.
    */
-  function reprocess() {
+  function reprocess(event) {
+    // Since this function can be called as not an event handler also, the event
+    // variable doesn't always exist.
+    // If it does, check if we triggered the handler with an up or down key, and
+    // don't do anything if the autoSelect option is on.
+    if (options.autoSelect && event != undefined && event.type == 'keyup' &&
+       (event.keyCode == 38 || event.keyCode == 40)) {
+      return false;
+    }
     var query = callbacks.canonicalQuery($input.val(), options.caseSensitive);
     clearTimeout(timer);
     // Indicate that timer is inactive
@@ -561,8 +573,12 @@ var defaultCallbacks = {
    *
    * @param {Object} $input
    *   The input DOM element, wrapped in jQuery.
+   *
+   * @param {Boolean} autoSelection
+   *   Whether the callback got fired by auto selection (up and down keys, when
+   *   this option is on).
    */
-  select: function(result, $input) {
+  select: function(result, $input, autoSelection) {
     $input.val(result.title);
   },
 
