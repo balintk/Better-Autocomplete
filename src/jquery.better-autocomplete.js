@@ -366,13 +366,21 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
   /**
    * Select the current highlighted element, if any.
    */
-  var select = function() {
+  var selectHighlighted = function(autoSelection) {
+    var autoSelection = autoSelection || false;
     var $result = $('.result', $results).eq(getHighlighted());
     if (!$result.length) {
       return; // No selectable element
     }
     var result = $result.data('result');
-    callbacks.select(result, $input);
+    callbacks.select(result, $input, autoSelection);
+  };
+
+  /**
+   * Select the current highlighted element, then redraw.
+   */
+  var select = function() {
+    selectHighlighted();
     // Redraw again, if the callback changed focus or content
     reprocess();
   };
