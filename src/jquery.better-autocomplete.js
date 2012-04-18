@@ -176,7 +176,8 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
     crossOrigin: false,
     selectKeys: [9, 13], // [tab, enter]
     autoHighlight: false, // true, auto-highlight first result
-    autoSelect: true // Select the highlighted element automatically
+    autoSelect: true, // Select the highlighted element automatically
+    autoReprocess: false // Whether to reprocess or not after an item has been selected
   }, options);
 
   callbacks = $.extend({}, defaultCallbacks, callbacks);
@@ -431,12 +432,20 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
   function reprocess(event) {
     // Since this function can be called as not an event handler also, the event
     // variable doesn't always exist.
-    // If it does, check if we triggered the handler with an up or down key, and
-    // don't do anything if the autoSelect option is on.
-    if (options.autoSelect && event != undefined && event.type == 'keyup' &&
-       (event.keyCode == 38 || event.keyCode == 40)) {
-      return false;
+    if (event != undefined) {
+      // Don't do anything, if autoSelect is on, and up or down key has been pressed.
+      if (options.autoSelect && event.type == 'keyup' &&
+        (event.keyCode == 38 || event.keyCode == 40)) {
+        return false;
+      }
+      // If autoReprocess is off empty the result popoup, then don't do anything else
+      // if the key that has been pressed is a select key.
+      if (!options.autoReprocess && event.type == 'keyup' && isSelectKeyPressed(event)) {
+        $results.empty();
+        return false;
+      }
     }
+
     var query = callbacks.canonicalQuery($input.val(), options.caseSensitive);
     clearTimeout(timer);
     // Indicate that timer is inactive
