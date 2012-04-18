@@ -222,9 +222,7 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
       return false;
     }
     // A select key has been pressed
-    else if ($.inArray(event.keyCode, options.selectKeys) >= 0 &&
-             !event.shiftKey && !event.ctrlKey && !event.altKey &&
-             !event.metaKey) {
+    else if (isSelectKeyPressed(event)) {
       select();
       return event.keyCode == 9; // Never cancel tab
     }
@@ -541,6 +539,20 @@ var BetterAutocomplete = function($input, resource, options, callbacks) {
       $result.insertAfter($target.length ? $target : $traverseFrom);
     });
   };
+
+  /**
+   * Determine whether a select key has been pressed.
+   *
+   * @param {eventObject} event
+   *    The Event object of a keyup/keydown/etc.
+   *
+   * @returns {Boolean}
+   *    true, if the key that has been pressed is a select key, false otherwise.
+   */
+  var isSelectKeyPressed = function(event) {
+    return $.inArray(event.keyCode, options.selectKeys) >= 0 && !event.shiftKey &&
+           !event.ctrlKey && !event.altKey && !event.metaKey;
+  }
 };
 
 /*
